@@ -1,0 +1,28 @@
+{
+  "fields": [
+    {
+      "name" : "year",
+      "type" : "int",
+      "removeEmpty" : "true",
+      "castToType" : "true"
+    },
+    {
+      "name" : "good",
+      "type" : "int",
+      "removeEmpty" : "true",
+      "castToType" : "true"
+    },
+    {
+      "name" : "moderate",
+      "type" : "int",
+      "removeEmpty" : "true",
+      "castToType" : "true"
+    },
+    {
+      "name" : "unhealthy",
+      "type" : "int",
+      "removeEmpty" : "true",
+      "castToType" : "true"
+    }
+  ]
+}
