@@ -1,0 +1,16 @@
+{
+  "name": "dpl",
+  "version": "1.0.0",
+  "description": "data pipes",
+  "main": "handler.js",
+  "dependencies": {
+    "chai": "^4.1.2",
+    "jsonschema": "^1.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "mocha tests --recursive --watch"
+  },
+  "author": "Paul Walker",
+  "license": "UNLICENSED"
+}

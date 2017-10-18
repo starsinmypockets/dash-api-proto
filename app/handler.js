@@ -16,9 +16,17 @@ module.exports.hello = (event, context, callback) => {
 }
 
 module.exports.validateSchema = (event, context, callback) => {
+  const res = _validateSchema(event.payload, event.validator)
+
+  callback(null, res)
+}
+
+
+const _validateSchema = (payload, validator) => {
   const Validator = require('jsonschema')
   const v = new Validator.Validator()
-  const result = v.validate(event.payload, event.validator)
-  
-  callback(null, result)
+  return v.validate(payload, validator)
 }
+
+// Exports for testing
+module.exports._validateSchema = _validateSchema
