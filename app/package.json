@@ -5,6 +5,7 @@
   "main": "handler.js",
   "dependencies": {
     "chai": "^4.1.2",
+    "ckan": "^0.2.3",
     "jsonschema": "^1.2.0"
   },
   "devDependencies": {},

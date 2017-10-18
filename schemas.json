@@ -1,0 +1,50 @@
+// dataResource jsonSchema
+{
+  "resourceType": "string",
+  "resourceTypeVersion": "string",
+  "resourceTypeDefinition": "url",
+  "format": "string",
+  "location": "url",
+  "description": "string",
+  "created": ""
+  "resourceId": "uuid",
+  "nativeSchema": "json",
+  "fields": [
+    "/dataResourceField"
+  ]
+}
+
+// dataResource metadata for CKAN
+{
+  "resourceType": "CKAN",
+  "resourceTypeVersion": "3",
+  "resourceTypeDefinition": "https://ckan.org/foo",
+  "format": "CSV",
+  "location": "http://ckan.net/storage/f/file/3ffdcd42-5c63-4089-84dd-c23876259973",
+  "description": "Adur District Council April 2009",
+  "created": "2017-07-18T13:16:28.648926",
+  "revised": "2017-07-28T11:00:18.936789",
+  "id": "7e854221-ec7f-4cad-b0f6-061406138181",
+  "revisionId": "7e854221-ec7f-4cad-b0f6-061406138181",
+  "nativeMetadata": "... long ass string here",
+  "fields": [
+    "/dataResourceField"
+  ]
+}
+
+// dataResource metadata for XML
+{
+  "resourceType": "string"
+  "resourceTypeVersion": "string", // 3
+  "resourceTypeDefinition": "url",
+  "format": "string", // CSV
+  "location": "url",
+  "description": "string",
+  "created": ""
+  "resourceId": "uuid", // use CKAN native resource uuid
+  "nativeSchema": "json", // CKAN serialized package metadat
+  "fields": [
+    "/dataResourceField"
+  ]
+
+}
