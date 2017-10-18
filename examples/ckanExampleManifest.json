@@ -1,0 +1,11 @@
+{
+  "loadExternalMetaData" : true,
+  "externalMetaDataUrl" : "https://demo.ckan.org/api/3/action/package_show?id=adur_district_spending",
+  "externalMetaDataType" : "ckan",
+  "dateResources" : [
+    {
+      "resourceIdentifierName" : "id",
+      "resourceIdentifier" : "beb6c3a6-098d-4389-b0a2-de0243728b42"
+    }
+  ]
+}
