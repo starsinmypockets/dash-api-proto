@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 module.exports.hello = (event, context, callback) => {
   const response = {
@@ -16,5 +16,9 @@ module.exports.hello = (event, context, callback) => {
 }
 
 module.exports.validateSchema = (event, context, callback) => {
-  callback(null, event.payload)
+  const Validator = require('jsonschema')
+  const v = new Validator.Validator()
+  const result = v.validate(event.payload, event.validator)
+  
+  callback(null, result)
 }
