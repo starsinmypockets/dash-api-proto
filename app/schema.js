@@ -1,3 +1,5 @@
+const uuid = module.exports.uuid = "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+
 module.exports.schema = {
   // configuration options for dataResources to be imported
   dataResourceDefinition: {
@@ -31,25 +33,50 @@ module.exports.schema = {
       resourceLocation: {
         type: "string",
         required: true
+      },
+      description: {
+        type: "string"
       }
     },
   },
 
   // generated metadata for all tracked data resources
   dataResourceMetadata: {
-    format: "string",
-    definition: "dataResourceDefinition",
-    id: "uuid",
-    revisionId: "uuid",
-    imported: "maybe date",
-    updated: "maybe date",
-    location: {
-      type: "string",
-      format: "uri"
-    },
-    description: "maybe string",
-    sizeMB: "maybe number",
-    records: "maybe number",
-    nativeMetadata: "json string"
+    title: "dataResourceMetadata",
+    properties: {
+      dataResourceDefinition: {type: "string"}, 
+      id: {
+        type: "string",
+        pattern: uuid,
+        required: true
+      },
+      revisionId: {
+        type: "string",
+        pattern: uuid
+      },
+      imported: {
+        type: "number",
+        required: true
+      },
+      updated: {
+        type: "number"
+      },
+      location: {
+        type: "string",
+        required: true
+      },
+      description: {
+        type: "string"
+      },
+      sizeMB: {
+        type: "number"
+      },
+      records: {
+        type: "number"
+      },
+      nativeMetadata: {
+        type: "string"
+      }
+    }
   }
 }

@@ -133,3 +133,41 @@ describe('Validate schema should fail for an invalid dataResource config object 
     assert.equal(validated.errors.length, 3)
   })
 })
+
+describe('Valid dataResourceMetadata object should pass validation', () => {
+  const now = Date.now()
+  const schema = schemas.dataResourceMetadata
+  const resourceObject = {
+    id: "9a50711e-b50f-11e7-abc4-cec278b6b50a",
+    imported: now,
+    location: "some url here",
+    description: "What a beautiful piece of data",
+    sizeMB: 2046
+  }
+  const validated = validateSchema(resourceObject, schema)
+
+  it('Should return a validator response object', () => assert.isObject(validated))
+
+  it('Validator object should contain 0 errors', () => {
+    assert.equal(validated.errors.length, 0)
+  })
+})
+
+describe('Invalid dataResourceMetadata object should fail validation', () => {
+  const now = Date.now()
+  const schema = schemas.dataResourceMetadata
+  const resourceObject = {
+    id: "9a50711e-b50f-11e7-abc4-cec278b6b50a",
+    // imported: now,  <-- required field missing
+    location: "some url here",
+    description: "What a beautiful piece of data",
+    sizeMB: "invalid type"
+  }
+  const validated = validateSchema(resourceObject, schema)
+
+  it('Should return a validator response object', () => assert.isObject(validated))
+
+  it('Validator object should contain 2 errors', () => {
+    assert.equal(validated.errors.length, 2)
+  })
+})
