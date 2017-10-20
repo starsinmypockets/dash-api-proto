@@ -55,9 +55,6 @@ provider:
 #    - exclude-me-dir/**
 
 functions:
-  hello:
-    handler: handler.hello
-  
   validateSchema:
     handler: handler.validateSchema
 
