@@ -1,11 +1,54 @@
 'use strict'
 
-const fetch = require('node-fetch');
-const AWS = require('aws-sdk');
-const s3 = new AWS.S3();
+const fetch = require('node-fetch')
+const AWS = require('aws-sdk')
+const s3 = new AWS.S3()
+
+///////////////////////
+// Units for testing /
+/////////////////////
+
+const _validateSchema = module.exports._validateSchema = (payload, validator) => {
+  const Validator = require('jsonschema')
+  const v = new Validator.Validator()
+  return v.validate(payload, validator)
+}
+
+/**
+ * @return valid dashboard object
+ *
+ **/
+const _getDashboard = module.exports._getDashboard = (event, callback) => {
+  // validate request against request schema
+  
+  switch (event.backend) {
+    case 'cartodb':
+      if (event.query) {
+        const url = event.url + event.query
+        console.log("URL", url)
+        fetch(url).then(res => {
+          return res.json()
+        }).then(json => {
+          callback(null, json)
+        }).catch(err => {
+          console.log('ERR', err)
+          callback(err)
+        })
+      }
+      break
+    case 'csv':
+      return {}
+      break
+      // handle
+    default:
+      return {}
+      break
+      // umm fail
+  }
+}
 
 ////////////////////
-// LAMBDA EXPORTS /
+// nodejs Exports /
 //////////////////
 
 /**
@@ -49,11 +92,6 @@ module.exports.getS3ResourceInfo = (event, context, callback) => {
   // grab it
 }
 
-///////////////////////
-// Units for testing /
-/////////////////////
-const _validateSchema = module.exports._validateSchema = (payload, validator) => {
-  const Validator = require('jsonschema')
-  const v = new Validator.Validator()
-  return v.validate(payload, validator)
+module.exports.getDashboard = (event, context, callback) => {
+  _getDashboard(event, callback)
 }
