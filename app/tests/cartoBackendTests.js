@@ -4,7 +4,7 @@
 const chai = require('chai')
 const _getComponentData = require('../handler.js')._getComponentData
 const assert = chai.assert
-const cartoRes = require('./cartores1.json')
+const cartoRes = require('./apires1.json')
 const util = require('util')
 const inspect = (obj) => {
   console.log(util.inspect(obj, {depth: null, colors: true}))
@@ -19,14 +19,14 @@ describe('Carto res object is valid for testing', () => {
 describe('carto to nvd3 piechart series works', () => {
   const dashboardData = cartoRes.data
   const component = cartoRes.regions[0].children[0]
-  const componentData = _getComponentData(component, dashboardData)
+  const newComponent = _getComponentData(component, dashboardData)
     console.log('component')
-    inspect(componentData)
+    inspect(newComponent)
   it('Piechart series object is array', () => {
-    assert.isArray(componentData)
+    assert.isArray(newComponent.data)
   })
   it('Piechart series object has expected fields', () => {
-    assert.isDefined(componentData[0].x)
-    assert.isDefined(componentData[0].y)
+    assert.isDefined(newComponent.data[0].x)
+    assert.isDefined(newComponent.data[0].y)
   })
 })

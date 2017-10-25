@@ -77,10 +77,11 @@ const _getComponentData = module.exports._getComponentData = (component, dashboa
 
       })
       
-      const output = _.zipWith(...fieldArrays, Object.assign)
-      return output;
+      //merge dataFields into array of objects with required fields 
+      const componentData = _.zipWith(...fieldArrays, Object.assign)
+      
+      return Object.assign(component, {data: componentData})
 
-    // 
     case 'scalarValue':
       break
     
