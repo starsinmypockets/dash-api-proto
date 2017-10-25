@@ -1,12 +1,10 @@
 'use strict'
 
 const fetch = require('node-fetch')
+const _ = require('lodash')
 const AWS = require('aws-sdk')
+const {reduce, map, filter} = require('async')
 const s3 = new AWS.S3()
-
-///////////////////////
-// Units for testing /
-/////////////////////
 
 const _validateSchema = module.exports._validateSchema = (payload, validator) => {
   const Validator = require('jsonschema')
@@ -14,82 +12,86 @@ const _validateSchema = module.exports._validateSchema = (payload, validator) =>
   return v.validate(payload, validator)
 }
 
-/**
- * @return valid dashboard object
- *
- **/
+const _fetchResource = module.exports._fetchResource = (resource, callback) => {
+    switch (resource.resourceType) {
+      case 'cartodb':
+        if (resource.query) {
+          const url = resource.url + resource.query
+          fetch(url).then(res => {
+            return res.json()
+          }).then(json => {
+            // return the resource with data attached
+            callback(null, Object.assign({
+              data: json
+            }, resource))
+          }).catch(err => {
+            callback(err)
+          })
+        }
+        break
+      case 'csv':
+        return {}
+        break
+        // handle
+      default:
+        return {}
+        break
+        // umm fail
+    }
+}
+
+const _fetchDataResources = module.exports._getResource = (event, callback) => {
+  map(event.dataResources, _fetchResource, callback)
+}
+
 const _getDashboard = module.exports._getDashboard = (event, callback) => {
-  // validate request against request schema
-  
-  switch (event.backend) {
-    case 'cartodb':
-      if (event.query) {
-        const url = event.url + event.query
-        console.log("URL", url)
-        fetch(url).then(res => {
-          return res.json()
-        }).then(json => {
-          callback(null, json)
-        }).catch(err => {
-          console.log('ERR', err)
-          callback(err)
+  _fetchDataResources(event, (err, data) => {
+    const dashObj = Object.assign({data: data}, event)
+    callback(null, dashObj)
+  })
+}
+
+// dashboardData = cartoDB sql api return datasets
+const _getComponentData = module.exports._getComponentData = (component, dashboardData, callback) => {
+  // each case in this switch represents an adaptor to a component
+  // these will generate data of a certain shape
+  switch (component.dataType) {
+    // [ { FIELDNAME : VALUE, ...} , ...]
+    case 'NVD3Series':
+      const fieldArrays = _.map(component.dataFields, dataField => {
+        const resourceField = dataField.dataResourceField
+        const componentField = dataField.fieldName
+
+        // get the appropriate dataResource
+        const dataResource = _.filter(dashboardData, resource => resource.resourceHandle === dataField.dataResource)[0]
+        
+        // get an array of field values for the desired field
+        const fieldArray = _.map(dataResource.data.rows, row => {
+          const val = row[resourceField] ? row[resourceField] : null
+          let fieldRow = {}
+          fieldRow[componentField] = val
+          return fieldRow
         })
-      }
+
+        return fieldArray
+
+      })
+      
+      const output = _.zipWith(...fieldArrays, Object.assign)
+      return output;
+
+    // 
+    case 'scalarValue':
       break
-    case 'csv':
-      return {}
-      break
-      // handle
+    
     default:
-      return {}
       break
-      // umm fail
   }
 }
 
-////////////////////
-// nodejs Exports /
-//////////////////
-
-/**
- * Validate a schema using nodejs JSONSchema implementation
- **/
 module.exports.validateSchema = (event, context, callback) => {
   const res = _validateSchema(event.payload, event.validator)
-
   callback(null, res)
-}
-
-/**
- * Fetch a resource using aws sdk and 
- * upload to specified s3 bucket
- **/
-module.exports.fetchToS3 = (event, context, callback) => {
-  fetch(event.url)
-    .then((response) => {
-      if (response.ok) {
-        return response;
-      }
-      return Promise.reject(new Error(
-        `Failed to fetch ${response.url}: ${response.status} ${response.statusText}`));
-    })
-    .then(response => response.buffer())
-    .then(buffer => (
-      s3.putObject({
-        Bucket: event.bucket,
-        Key: event.key,
-        Body: buffer,
-      }).promise()
-    ))
-    .then(v => callback(null, v), callback);
-};
-
-/**
- * Given a valid tag get s3 metadata for a dataResource
- *
- */
-module.exports.getS3ResourceInfo = (event, context, callback) => {
-  // grab it
 }
 
 module.exports.getDashboard = (event, context, callback) => {

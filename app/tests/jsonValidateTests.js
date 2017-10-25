@@ -1,7 +1,9 @@
+"use strict"
+
 const chai = require('chai')
 const assert = chai.assert // we are using the "expect" style of Chai
 const validateSchema = require('../handler.js')._validateSchema
-const schemas = require('../schema.js').schema
+const schemas = require('../schemas.js').schema
 
 const simpleSchema = {
   "title": "Person",
