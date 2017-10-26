@@ -7,7 +7,7 @@
             "comment": "**All imported data is assumed to be in cartodb sql api return value format",
             "resourceType": "cartodb",
             "url": "https://phl.carto.com/api/v2/sql",
-            "query": "?q=SELECT%20service_name,%20COUNT(cartodb_id)%20FROM%20public_cases_fc%20GROUP%20BY%20service_name"
+            "query": "?q=SELECT%20service_name,%20COUNT(cartodb_id)%20FROM%20public_cases_fc%20GROUP%20BY%20service_name ORDER BY count DESC LIMIT 10"
         }
     ],
     "regions": [
@@ -35,31 +35,31 @@
                     ],
                     "settings": {
                         "type": "pieChart",
-                        "x": "x",
-                        "y": "y"
+                        "height": 1500
+
                     }
                 },
                 {
                     "type": "Chart",
-                    "header": "Request Type ][",
+                    "dataType": "NVD3Series",
+                    "header": "Request Type",
                     "className": "col-md-6",
-                    "iconClass": "fa fa-car",
+                    "iconClass": "fa fa-tree",
                     "dataFields": [
                         {
-                            "fieldName": "x",
+                            "fieldName": "Service",
                             "dataResource": "byServiceName",
                             "dataResourceField": "service_name"
                         },
                         {
-                            "fieldName": "y",
+                            "fieldName": "Count",
                             "dataResource": "byServiceName",
                             "dataResourceField": "count"
                         }
                     ],
                     "settings": {
                         "type": "pieChart",
-                        "x": "x",
-                        "y": "y"
+                        "height": 900
                     }
                 }
             ]
