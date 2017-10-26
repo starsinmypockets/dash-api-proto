@@ -47,7 +47,13 @@ const _fetchDataResources = module.exports._getResource = (event, callback) => {
 const _getDashboard = module.exports._getDashboard = (event, callback) => {
   _fetchDataResources(event, (err, data) => {
     const dashObj = Object.assign({data: data}, event)
-    callback(null, dashObj)
+    const _regions = Object.assign(dashObj.reqions, {})
+    const regions = map(_regions, region => {
+      const children = map(region.children, _getComponentData.bind({dashboardData: data}))
+      return Object.assign(region, {children: children} )
+    })
+    const newDashObj = Object.assign(dashObj, regions)
+    callback(null, newDashObj)
   })
 }
 
