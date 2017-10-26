@@ -12,88 +12,109 @@ const _validateSchema = module.exports._validateSchema = (payload, validator) =>
   return v.validate(payload, validator)
 }
 
-const _fetchResource = module.exports._fetchResource = (resource, callback) => {
+const _fetchResource = module.exports._fetchResource = (resource) => {
     switch (resource.resourceType) {
       case 'cartodb':
+        
+        // @@TODO this can be another function
         if (resource.query) {
-          const url = resource.url + resource.query
-          fetch(url).then(res => {
-            return res.json()
-          }).then(json => {
-            // return the resource with data attached
-            callback(null, Object.assign({
-              data: json
-            }, resource))
-          }).catch(err => {
-            callback(err)
+          return new Promise((resolve, reject) => {
+            const url = resource.url + resource.query
+            fetch(url).then(res => {
+              return res.json()
+            }).then(json => {
+              // return the resource with data attached
+              const fetchedData = Object.assign({data: json}, resource)
+              resolve(fetchedData)
+            }).catch(err => {
+              reject(err)
+            })
           })
         }
+
         break
       case 'csv':
-        return {}
+        return Promise.resolve({})
         break
         // handle
       default:
-        return {}
+        return Promise.reject("Cannot fetch resource, invalid resourceType")
         break
         // umm fail
     }
 }
 
-const _fetchDataResources = module.exports._getResource = (event, callback) => {
-  map(event.dataResources, _fetchResource, callback)
-}
+const _fetchDataResources = module.exports._fetchDataResources = (dashboardObj) => {
+  const promises = dashboardObj.dataResources.map(resource => {
+    return _fetchResource(resource)
+  })
 
-const _getDashboard = module.exports._getDashboard = (event, callback) => {
-  _fetchDataResources(event, (err, data) => {
-    const dashObj = Object.assign({data: data}, event)
-    const _regions = Object.assign(dashObj.reqions, {})
-    const regions = map(_regions, region => {
-      const children = map(region.children, _getComponentData.bind({dashboardData: data}))
-      return Object.assign(region, {children: children} )
-    })
-    const newDashObj = Object.assign(dashObj, regions)
-    callback(null, newDashObj)
+  return new Promise((resolve, reject) => {
+    Promise.all(promises)
+      .then(data => {
+        resolve(data)
+      })
+      .catch(err => {
+        reject(err)
+      })
   })
 }
 
+// [ { FIELDNAME : VALUE, ...} , ...]
+const _getNVD3Series = module.exports._getNVD3Series = (component, dashboardObject) => {
+  const fieldArrays = _.map(component.dataFields, dataField => {
+    const resourceField = dataField.dataResourceField
+    const componentField = dataField.fieldName
+
+    // get the appropriate dataResource
+    const dataResource = _.filter(dashboardObject.data, resource => resource.resourceHandle === dataField.dataResource)[0]
+    
+    // get an array of field values for the desired field
+    const fieldArray = _.map(dataResource.data.rows, row => {
+      const val = row[resourceField] ? row[resourceField] : null
+      let fieldRow = {}
+      fieldRow[componentField] = val
+      return fieldRow
+    })
+
+    return fieldArray
+  })
+  
+  //merge dataFields into array of objects with required fields 
+  const componentData = _.zipWith(...fieldArrays, Object.assign)
+  
+  return Promise.resolve(Object.assign(component, {data: componentData}))
+}
+
 // dashboardData = cartoDB sql api return datasets
-const _getComponentData = module.exports._getComponentData = (component, dashboardData, callback) => {
-  // each case in this switch represents an adaptor to a component
-  // these will generate data of a certain shape
+const _getComponentData = module.exports._getComponentData = (component, dashboardData) => {
   switch (component.dataType) {
-    // [ { FIELDNAME : VALUE, ...} , ...]
     case 'NVD3Series':
-      const fieldArrays = _.map(component.dataFields, dataField => {
-        const resourceField = dataField.dataResourceField
-        const componentField = dataField.fieldName
-
-        // get the appropriate dataResource
-        const dataResource = _.filter(dashboardData, resource => resource.resourceHandle === dataField.dataResource)[0]
-        
-        // get an array of field values for the desired field
-        const fieldArray = _.map(dataResource.data.rows, row => {
-          const val = row[resourceField] ? row[resourceField] : null
-          let fieldRow = {}
-          fieldRow[componentField] = val
-          return fieldRow
-        })
-
-        return fieldArray
-
-      })
-      
-      //merge dataFields into array of objects with required fields 
-      const componentData = _.zipWith(...fieldArrays, Object.assign)
-      
-      return Object.assign(component, {data: componentData})
-
+      return _getNVD3Series(component, dashboardData)
     case 'scalarValue':
       break
-    
     default:
       break
   }
+}
+
+const _getDashboard = module.exports._getDashboard = (dashboardObject) => {
+  const _regions = Object.assign(dashboardObject.regions, {})
+  
+  const regionUpdates = _regions.map(region => {
+    const componentUpdates = region.children.map(component => {
+      return (_getComponentData(component, dashboardObject))
+    })
+
+    Promise.all(componentUpdates).then(updates => {
+      Promise.resolve(updates)
+    })
+  })
+
+  Promise.all(regionUpdates)
+    .then(newDashObj => {
+      Promise.resolve( newDashObj)
+    })
 }
 
 module.exports.validateSchema = (event, context, callback) => {
@@ -102,5 +123,17 @@ module.exports.validateSchema = (event, context, callback) => {
 }
 
 module.exports.getDashboard = (event, context, callback) => {
-  _getDashboard(event, callback)
+  _fetchDataResources(event)
+    .then(data => {
+      // fetch data
+      const dashboardObject = Object.assign(event, {data: data}) 
+
+      // map data to components and return
+      _getDashboard(dashboardObject)
+        .then(newDashboard => callback(null, newDashboard))
+        .catch(err => {callback(err, event)})
+    })
+    .catch(err => {
+      callback(err, event)
+    })
 }
