@@ -23,7 +23,6 @@ describe('Carto res object is valid for testing', () => {
 describe('Make sure config obj has valid component', () => {
   it ('looks sane', () => {
     assert.isObject(component)
-    assert.equal(component.dataType, 'NVD3Series')
   })
 })
 
