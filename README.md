@@ -3,4 +3,7 @@ This is just a prototype for a dashboard api using aws lambda and the serverless
 
 ## Tests
 With npm installed
-* `npm install && cd tests && npm run tests`
+* `git clone git@github.com:starsinmypockets/dash-api-proto.git`
+* `cd dash-api-proto/app`
+* `npm install`
+* `npm run test`
