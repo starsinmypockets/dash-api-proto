@@ -34,7 +34,7 @@ const _fetchResource = module.exports._fetchResource = (resource) => {
 
         break
       case 'csv':
-        return Promise.resolve({})
+        return Promise.reject("Cannot fetch resource, resourceType - CSV not yet supported")
         break
         // handle
       default:
@@ -52,16 +52,15 @@ const _fetchDataResources = module.exports._fetchDataResources = (dashboardObj) 
   return new Promise((resolve, reject) => {
     Promise.all(promises)
       .then(data => {
-        console.log(">>>>data", data)
         resolve(data)
       })
       .catch(err => {
-        console.log('the er', err)
         reject(err)
       })
   })
 }
 
+// @@TODO this should be _getNVD3PieChartSeries
 // [ { FIELDNAME : VALUE, ...} , ...]
 const _getNVD3Series = module.exports._getNVD3Series = (component, dashboardObject) => {
   const fieldArrays = component.dataFields.map(dataField => {
@@ -101,6 +100,7 @@ const _getComponentData = module.exports._getComponentData = (component, dashboa
     case 'scalarValue':
       break
     default:
+      return component
       break
   }
 }
@@ -109,13 +109,18 @@ const _mapComponentData = module.exports._mapComponentData = (dashboardObject) =
 
   const regions = dashboardObject.regions.map(region => {
     const children = region.children.map(component => {
-      console.log('ii', component)
+      
       return _getComponentData(component, dashboardObject)
     })
     const newRegion = Object.assign(region, {children: children})
   })
   const updatedDashboardObject = Object.assign(dashboardObject, regions)
   return updatedDashboardObject
+}
+
+module.exports.hello = (event, context, callback) => {
+  const res = JSON.stringify({hello: "world"});
+  callback(null, res)
 }
 
 module.exports.validateSchema = (event, context, callback) => {

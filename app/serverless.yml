@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: app
+service: open-data-visuals-server
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
@@ -55,6 +55,15 @@ provider:
 #    - exclude-me-dir/**
 
 functions:
+  hello:
+    handler: handler.hello
+    description: Test api gateway 
+    events:
+      - cloudwatchLog: '/aws/lambda/hello'
+      - http: 
+          path: hello
+          method: get
+    
   validateSchema:
     handler: handler.validateSchema
 
@@ -63,6 +72,11 @@ functions:
 
   getDashboard:
     handler: handler.getDashboard
+    description: Given a valid dashboard request return a dashboard
+    events:
+      - http: 
+          path: dashboard
+          method: post
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events

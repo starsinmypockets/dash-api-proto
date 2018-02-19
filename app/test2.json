@@ -1,0 +1,18 @@
+ 
+  Error --------------------------------------------------
+ 
+  Callback was already called.
+ 
+     For debugging logs, run again after setting the "SLS_DEBUG=*" environment variable.
+ 
+  Get Support --------------------------------------------
+     Docs:          docs.serverless.com
+     Bugs:          github.com/serverless/serverless/issues
+     Forums:        forum.serverless.com
+     Chat:          gitter.im/serverless/serverless
+ 
+  Your Environment Information -----------------------------
+     OS:                     linux
+     Node Version:           7.1.0
+     Serverless Version:     1.23.0
+ 

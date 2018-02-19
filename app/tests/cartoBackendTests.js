@@ -11,7 +11,7 @@ const util = require('util')
 const inspect = (obj) => {
   console.log(util.inspect(obj, {depth: null, colors: true}))
 }
-const component = Object.assign({}, config.regions[0].children[0])
+const component = Object.assign({}, config.regions[1].children[0])
 const resource = Object.assign({}, config.dataResources[0])
 
 describe('Carto res object is valid for testing', () => {
@@ -45,9 +45,21 @@ describe('Test fetch carto resource returns data', () => {
   })
 })
 
+describe('Trying to fetch resource with invalid dataType should fail friendly', () => {
+  it('_fetchResource should return a valid res', () => {
+    assert.isOk(true, "@@TODO")
+  })
+})
+
+describe('Trying to fetch resource with missing dataType should fail friendly', () => {
+  it('_fetchResource should return a valid res', () => {
+    assert.isOk(true, "@@TODO")
+  })
+})
+
 describe('Test fetch resources', () => {
-  it('_fetchDataResources should return a valid res', () => {
-    return Api._fetchDataResources(config).then(res => {
+  return it('_fetchDataResources should return a valid res', () => {
+    Api._fetchDataResources(config).then(res => {
       assert.isArray(res, "dataResources is array")
       assert.isObject(res[0].data, "first resource has data object")
       assert.isOk(res[0].data.rows.length > 0, "first resource has rows")
@@ -56,7 +68,6 @@ describe('Test fetch resources', () => {
 })
 
 describe('Test mapComponentData', () => {
-  console.log("sssss", config.regions)
   return it('_fetchDataResources should return a valid res', () => {
      Api._fetchDataResources(config).then(res => {
         // mock:
